@@ -15,10 +15,24 @@ export async function node(
   const node = express();
   node.use(express.json());
   node.use(bodyParser.json());
+  let state = {
+    killed: false,
+    x: initialValue, // initial consensus value
+    decided: null,
+    k: null
+  };
+  
 
   // TODO implement this
   // this route allows retrieving the current status of the node
   // node.get("/status", (req, res) => {});
+  node.get('/status', (req, res) => {
+    if (isFaulty) {
+      res.status(500).send('faulty');
+    } else {
+      res.status(200).send('live');
+    }
+  });
 
   // TODO implement this
   // this route allows the node to receive messages from other nodes
@@ -35,7 +49,10 @@ export async function node(
   // TODO implement this
   // get the current state of a node
   // node.get("/getState", (req, res) => {});
-
+  node.get ('/getState', (req, res) => {
+    res.status(200).send(state);
+  });
+  
   // start the server
   const server = node.listen(BASE_NODE_PORT + nodeId, async () => {
     console.log(
